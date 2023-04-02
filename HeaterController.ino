@@ -1,4 +1,6 @@
 #define Log Serial.println
+#define DEBUG false 
+#define DEBOUNCER 500
 
 class ArduinoComponent {
   private: 
@@ -7,37 +9,56 @@ class ArduinoComponent {
     byte value; 
 };
 
+class Relay : public ArduinoComponent {
+  public: 
+    Relay(byte _pinNumber): pinNumber(_pinNumber), turnedOn(false){
+      pinMode(pinNumber, OUTPUT);
+    }
+
+    void turnOn(){
+      turnedOn ? Log("Se va a apagar") : Log("Se va a prender");
+      digitalWrite(pinNumber,turnedOn=!turnedOn);
+      return turnedOn;
+    }
+  private: 
+    byte pinNumber;
+    bool turnedOn;
+};
+
 //PWM Class
 class PWM : public ArduinoComponent {
   public:
     PWM(byte _pinNumber): pinNumber(_pinNumber), value(20){
       pinMode(pinNumber, OUTPUT);
+      updatePWM(20);
     }
     
-    byte speedUp(){
+    void speedUp(){
       if (value + 20 > 100){
         Log("No se aumenta por estar al máximo. PWM: " + (String)value);
         
         return value;
       }
       value+=20;
+      Log((String)"Se aumenta velocidad: " + value);
       updatePWM(value);
       return value;
     }
 
-    byte speedDown(){
+    void speedDown(){
       if (value - 20 < 20){
         Log("No se disminuye por estar al minimo. PWM: " + (String)value);
         return value;
       }
       value-=20;
+      Log((String)"Se disminuye velocidad: " + value);
       updatePWM(value);
       return value;
     }
 
-    void updatePWM(char value){
+    void updatePWM(byte value){
       byte mapValue = map(value, 0, 100, 0, 255);
-      Serial.println("Se va a escribir " + (String)mapValue);
+      if (DEBUG) Log("Se va a escribir " + (String)mapValue);
       analogWrite(pinNumber, mapValue);
     }
 
@@ -62,10 +83,10 @@ class Button {
     void checkPressButton() {
       //TODO: Agregar debouncer
       byte read = digitalRead(pinNumber);
-      if(lastRead != read && read == 0 ){
-        Serial.println("last pin " + (String)pinNumber + " : " + (String)lastRead);
-        Serial.println("read: " + (String)read);
+      unsigned long time = millis();
+      if(lastRead != read && read == 0 && time - lastPush > DEBOUNCER){
         execute();
+        lastPush = time;
       }
       lastRead = read;
     }
@@ -93,22 +114,26 @@ class Button {
 
 
 //Button Press Functions
-void imprimir(){
-  Serial.println("impresion");
+void turnOn(Relay * relay){
+  relay->turnOn();
+  // Log((String)"Se maneja power: " + relay->turnOn());
 };
 
 void speedUp(PWM * pwm){
-  Log((String)"Se aumenta velocidad: " + pwm->speedUp());
+  pwm->speedUp();
+  // Log((String)"Se aumenta velocidad: " + pwm->speedUp());
 };
 
 void speedDown(PWM * pwm){
-  Log((String)"Se disminuye velocidad: " + pwm->speedDown());
+  pwm->speedDown();
+  //Log((String)"Se disminuye velocidad: " + pwm->speedDown());
 };
 
 
 
 //Initialization
-PWM * pwm = NULL;
+ArduinoComponent * pwm = NULL;
+ArduinoComponent * relay = NULL;
 Button * redButton = NULL;
 Button * orangeButton = NULL;
 Button * whiteButton = NULL; 
@@ -119,9 +144,10 @@ void setup() {
   // pinMode(pinOrange, INPUT_PULLUP);
   // pinMode(pinWhite, INPUT_PULLUP);
   pwm = new PWM(6);
+  relay = new Relay(5);
   redButton = new Button(2, &speedUp, pwm); 
   orangeButton = new Button(3, &speedDown, pwm);
-  whiteButton = new Button(4,&imprimir, pwm);
+  whiteButton = new Button(4,&turnOn, relay);
 };
 
 void loop() {
