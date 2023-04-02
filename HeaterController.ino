@@ -1,35 +1,3 @@
-// byte valor = 0;
-// byte outputPin = 6; 
-
-// void setup() {
-//   Serial.begin(9600);
-//   // put your setup code here, to run once:
-//   pinMode(outputPin, OUTPUT);
-// }
-
-// void loop() {
-//   // put your main code here, to run repeatedly:
-//   if (valor == 250 )
-//   {
-//     valor = 0;
-//   }
-//   Serial.println("el valor es ");
-//   Serial.println(valor);
-  
-//   delay(5000);
-
-//   valor += 25;
-//   analogWrite(outputPin, valor);
-// }
-
-// //Pines
-// byte pinRed=2;
-// byte pinOrange = 3;
-// byte pinWhite=4;
-// byte lastRed=1;
-// byte lastOrange=1;
-// byte lastWhite=1;
-
 #define Log Serial.println
 
 class ArduinoComponent {
@@ -42,7 +10,7 @@ class ArduinoComponent {
 //PWM Class
 class PWM : public ArduinoComponent {
   public:
-    PWM(byte pin): pinNumber(pin),value(20){
+    PWM(byte _pinNumber): pinNumber(_pinNumber),value(20){
       pinMode(pinNumber, OUTPUT);
     }
     
@@ -64,7 +32,7 @@ class PWM : public ArduinoComponent {
       return value-=20;
     }
 
-    void updatePWM(char value){
+    void updatePWM(byte value){
       analogWrite(pinNumber, map(value, 0, 100, 0, 255));
     }
 
@@ -76,13 +44,32 @@ class PWM : public ArduinoComponent {
     byte pinType = OUTPUT;
     byte value;
 
+} pwm;
+
+
+class Event {
+  public:
+    virtual void handle(ArduinoComponent & _arduinoComponent) = 0;
 };
 
+class SpeedUp : public Event {
+  public:
+    virtual void handle(PWM & pwm) {
+      Log((String)"Se aumenta velocidad: " + pwm->speedUp());
+    }
+} speedUp;
+
+class SpeedDown : public Event {
+  public:
+    virtual void handle(PWM & pwm) {
+      Log((String)"Se disminuye velocidad: " + pwm->speedDown());
+    }
+} speedDown;
 
 //Button Class
 class Button {
   public: 
-    Button(byte pin, void (*fn)(ArduinoComponent), ArduinoComponent * component) : pinNumber(pin), function(fn), lastRead(1), arduinoComponent(component) {
+    Button(byte _pinNumber, Event * _event, ArduinoComponent * _arduinoComponent) : pinNumber(_pinNumber), event(_event), lastRead(1), arduinoComponent(_arduinoComponent) {
       pinMode(pinNumber, INPUT_PULLUP);
     }
 
@@ -92,7 +79,7 @@ class Button {
       if(lastRead != read && read == 0 ){
         Serial.println("last pin " + (String)pinNumber + " : " + (String)lastRead);
         Serial.println("read: " + (String)read);
-        execute();
+        event->handle(&arduinoComponent);
       }
       lastRead = read;
     }
@@ -105,16 +92,12 @@ class Button {
       return lastPush;
     }
 
-    void execute(){
-      function(*arduinoComponent);
-    }
-
   private: 
     byte pinNumber;
     byte lastRead; 
     ArduinoComponent * arduinoComponent;
     unsigned long lastPush;
-    void (*function)(ArduinoComponent);
+    Event * event;
 };
 
 
@@ -124,18 +107,10 @@ void imprimir(){
   Serial.println("impresion");
 };
 
-void speedUp(PWM * pwm){
-  Log((String)"Se aumenta velocidad: " + pwm->speedUp());
-};
-
-void speedDown(PWM * pwm){
-  Log((String)"Se disminuye velocidad: " + pwm->speedDown());
-};
-
 
 
 //Initialization
-PWM pwm(6);
+// PWM pwm(6);
 Button redButton(2, &speedUp, &pwm); 
 Button orangeButton(3, &speedDown, &pwm);
 Button whiteButton(4,&imprimir, &pwm);
@@ -143,30 +118,11 @@ Button whiteButton(4,&imprimir, &pwm);
 
 void setup() {
   Serial.begin(9600);
-  // pinMode(pinRed, INPUT_PULLUP);
-  // pinMode(pinOrange, INPUT_PULLUP);
-  // pinMode(pinWhite, INPUT_PULLUP);
 };
 
 void loop() {
   redButton.checkPressButton();
   orangeButton.checkPressButton();
   whiteButton.checkPressButton();
-  // Log("El valor de pwm es: " + (String)pwm.getValue());
+  Log("El valor de pwm es: " + (String)pwm.getValue());
 };
-
-//Viejo
-// void loop() {
-//   checkPressButton(pinRed, lastRed);
-//   checkPressButton(pinOrange, lastOrange);
-//   checkPressButton(pinWhite, lastWhite);
-// }
-
-// void checkPressButton(byte pin, byte &lastRead) {
-//   byte read = digitalRead(pin);
-//   if(lastRead != read && read == 0 ){
-//     Serial.println("last pin " + (String)pin + " : " + (String)lastRead);
-//     Serial.println("read: " + (String)read);
-//   }
-//   lastRead = read;
-// }
