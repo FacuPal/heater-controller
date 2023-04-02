@@ -42,8 +42,8 @@ class ArduinoComponent {
 //PWM Class
 class PWM : public ArduinoComponent {
   public:
-    PWM(byte pin){
-      pinMode(pinNumber = pin, OUTPUT);
+    PWM(byte pin): pinNumber(pin){
+      pinMode(pinNumber, OUTPUT);
       value = 200;
     }
     
@@ -83,11 +83,8 @@ class PWM : public ArduinoComponent {
 //Button Class
 class Button {
   public: 
-    Button(byte pin, void (*fn)(ArduinoComponent), ArduinoComponent * component) : arduinoComponent(component) {
-      lastRead = 1;
-      function = fn;
-      arduinoComponent = component;
-      pinMode(pinNumber = pin, INPUT_PULLUP);
+    Button(byte pin, void (*fn)(ArduinoComponent), ArduinoComponent * component) : pinNumber(pin), function(fn), lastRead(1), arduinoComponent(component) {
+      pinMode(pinNumber, INPUT_PULLUP);
     }
 
     void checkPressButton() {
