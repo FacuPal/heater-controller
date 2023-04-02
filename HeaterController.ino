@@ -108,22 +108,25 @@ void speedDown(PWM * pwm){
 
 
 //Initialization
-PWM pwm(6);
-Button redButton(2, &speedUp, &pwm); 
-Button orangeButton(3, &speedDown, &pwm);
-Button whiteButton(4,&imprimir, &pwm);
-
+PWM * pwm = NULL;
+Button * redButton = NULL;
+Button * orangeButton = NULL;
+Button * whiteButton = NULL; 
 
 void setup() {
   Serial.begin(9600);
   // pinMode(pinRed, INPUT_PULLUP);
   // pinMode(pinOrange, INPUT_PULLUP);
   // pinMode(pinWhite, INPUT_PULLUP);
+  pwm = new PWM(6);
+  redButton = new Button(2, &speedUp, pwm); 
+  orangeButton = new Button(3, &speedDown, pwm);
+  whiteButton = new Button(4,&imprimir, pwm);
 };
 
 void loop() {
-  redButton.checkPressButton();
-  orangeButton.checkPressButton();
-  whiteButton.checkPressButton();
+  redButton->checkPressButton();
+  orangeButton->checkPressButton();
+  whiteButton->checkPressButton();
   // Log("El valor de pwm es: " + (String)pwm.getValue());
 };
