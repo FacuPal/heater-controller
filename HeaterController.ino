@@ -1,35 +1,3 @@
-// byte valor = 0;
-// byte outputPin = 6; 
-
-// void setup() {
-//   Serial.begin(9600);
-//   // put your setup code here, to run once:
-//   pinMode(outputPin, OUTPUT);
-// }
-
-// void loop() {
-//   // put your main code here, to run repeatedly:
-//   if (valor == 250 )
-//   {
-//     valor = 0;
-//   }
-//   Serial.println("el valor es ");
-//   Serial.println(valor);
-  
-//   delay(5000);
-
-//   valor += 25;
-//   analogWrite(outputPin, valor);
-// }
-
-// //Pines
-// byte pinRed=2;
-// byte pinOrange = 3;
-// byte pinWhite=4;
-// byte lastRed=1;
-// byte lastOrange=1;
-// byte lastWhite=1;
-
 #define Log Serial.println
 
 class ArduinoComponent {
@@ -42,7 +10,7 @@ class ArduinoComponent {
 //PWM Class
 class PWM : public ArduinoComponent {
   public:
-    PWM(byte pin): pinNumber(pin),value(20){
+    PWM(byte _pinNumber): pinNumber(_pinNumber), value(20){
       pinMode(pinNumber, OUTPUT);
     }
     
@@ -82,7 +50,7 @@ class PWM : public ArduinoComponent {
 //Button Class
 class Button {
   public: 
-    Button(byte pin, void (*fn)(ArduinoComponent), ArduinoComponent * component) : pinNumber(pin), function(fn), lastRead(1), arduinoComponent(component) {
+    Button(byte _pinNumber, void (*_function)(ArduinoComponent), ArduinoComponent * _arduinoComponent) : pinNumber(_pinNumber), function(_function), lastRead(1), arduinoComponent(_arduinoComponent) {
       pinMode(pinNumber, INPUT_PULLUP);
     }
 
@@ -154,19 +122,3 @@ void loop() {
   whiteButton.checkPressButton();
   // Log("El valor de pwm es: " + (String)pwm.getValue());
 };
-
-//Viejo
-// void loop() {
-//   checkPressButton(pinRed, lastRed);
-//   checkPressButton(pinOrange, lastOrange);
-//   checkPressButton(pinWhite, lastWhite);
-// }
-
-// void checkPressButton(byte pin, byte &lastRead) {
-//   byte read = digitalRead(pin);
-//   if(lastRead != read && read == 0 ){
-//     Serial.println("last pin " + (String)pin + " : " + (String)lastRead);
-//     Serial.println("read: " + (String)read);
-//   }
-//   lastRead = read;
-// }
