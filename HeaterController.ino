@@ -17,23 +17,28 @@ class PWM : public ArduinoComponent {
     byte speedUp(){
       if (value + 20 > 100){
         Log("No se aumenta por estar al máximo. PWM: " + (String)value);
-        updatePWM(value);
+        
         return value;
       }
-      return value+=20;
+      value+=20;
+      updatePWM(value);
+      return value;
     }
 
     byte speedDown(){
       if (value - 20 < 20){
         Log("No se disminuye por estar al minimo. PWM: " + (String)value);
-        updatePWM(value);
         return value;
       }
-      return value-=20;
+      value-=20;
+      updatePWM(value);
+      return value;
     }
 
     void updatePWM(char value){
-      analogWrite(pinNumber, map(value, 0, 100, 0, 255));
+      byte mapValue = map(value, 0, 100, 0, 255);
+      Serial.println("Se va a escribir " + (String)mapValue);
+      analogWrite(pinNumber, mapValue);
     }
 
     byte getValue(){
