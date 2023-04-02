@@ -55,7 +55,7 @@ class PWM : public ArduinoComponent {
 //Button Class
 class Button {
   public: 
-    Button(byte _pinNumber, void (*_function)(ArduinoComponent), ArduinoComponent * _arduinoComponent) : pinNumber(_pinNumber), function(_function), lastRead(1), arduinoComponent(_arduinoComponent) {
+    Button(byte _pinNumber, void (*_function)(ArduinoComponent*), ArduinoComponent * _arduinoComponent) : pinNumber(_pinNumber), function(_function), lastRead(1), arduinoComponent(_arduinoComponent) {
       pinMode(pinNumber, INPUT_PULLUP);
     }
 
@@ -79,7 +79,7 @@ class Button {
     }
 
     void execute(){
-      function(*arduinoComponent);
+      function(arduinoComponent);
     }
 
   private: 
@@ -87,7 +87,7 @@ class Button {
     byte lastRead; 
     ArduinoComponent * arduinoComponent;
     unsigned long lastPush;
-    void (*function)(ArduinoComponent);
+    void (*function)(ArduinoComponent*);
 };
 
 
