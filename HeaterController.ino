@@ -47,7 +47,7 @@ class PWM : public ArduinoComponent {
       value = 200;
     }
     
-    virtual byte speedUp(){
+    byte speedUp(){
       if (value + 20 > 100){
         Log("No se aumenta por estar al máximo. PWM: " + (String)value);
         updatePWM(value);
@@ -56,7 +56,7 @@ class PWM : public ArduinoComponent {
       return value+=20;
     }
 
-    virtual byte speedDown(){
+    byte speedDown(){
       if (value - 20 < 20){
         Log("No se disminuye por estar al minimo. PWM: " + (String)value);
         updatePWM(value);
@@ -69,7 +69,7 @@ class PWM : public ArduinoComponent {
       analogWrite(pinNumber, map(value, 0, 100, 0, 255));
     }
 
-    virtual byte getValue(){
+    byte getValue(){
       return value;
     }
   private: 
@@ -83,7 +83,7 @@ class PWM : public ArduinoComponent {
 //Button Class
 class Button {
   public: 
-    Button(byte pin, void (*fn)(ArduinoComponent), ArduinoComponent component){
+    Button(byte pin, void (*fn)(ArduinoComponent), ArduinoComponent * component) : arduinoComponent(component) {
       lastRead = 1;
       function = fn;
       arduinoComponent = component;
@@ -110,13 +110,13 @@ class Button {
     }
 
     void execute(){
-      function(arduinoComponent);
+      function(*arduinoComponent);
     }
 
   private: 
     byte pinNumber;
     byte lastRead; 
-    ArduinoComponent arduinoComponent;
+    ArduinoComponent * arduinoComponent;
     unsigned long lastPush;
     void (*function)(ArduinoComponent);
 };
@@ -128,21 +128,21 @@ void imprimir(){
   Serial.println("impresion");
 };
 
-void speedUp(PWM pwm){
-  Log((String)"Se aumenta velocidad: " + pwm.speedUp());
+void speedUp(PWM * pwm){
+  Log((String)"Se aumenta velocidad: " + pwm->speedUp());
 };
 
-void speedDown(PWM pwm){
-  Log((String)"Se disminuye velocidad: " + pwm.speedDown());
+void speedDown(PWM * pwm){
+  Log((String)"Se disminuye velocidad: " + pwm->speedDown());
 };
 
 
 
 //Initialization
 PWM pwm(6);
-Button redButton(2, &speedUp, pwm); 
-Button orangeButton(3, &speedDown, pwm);
-Button whiteButton(4,&imprimir, pwm);
+Button redButton(2, &speedUp, &pwm); 
+Button orangeButton(3, &speedDown, &pwm);
+Button whiteButton(4,&imprimir, &pwm);
 
 
 void setup() {
