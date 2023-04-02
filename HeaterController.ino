@@ -57,7 +57,7 @@ class PWM : public ArduinoComponent {
     }
 
     void updatePWM(byte value){
-      byte mapValue = map(value, 0, 100, 0, 255);
+      byte mapValue = map(value, 0, 100, 255, 0);
       if (DEBUG) Log("Se va a escribir " + (String)mapValue);
       analogWrite(pinNumber, mapValue);
     }
