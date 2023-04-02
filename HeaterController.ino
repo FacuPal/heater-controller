@@ -42,9 +42,8 @@ class ArduinoComponent {
 //PWM Class
 class PWM : public ArduinoComponent {
   public:
-    PWM(byte pin): pinNumber(pin){
+    PWM(byte pin): pinNumber(pin),value(20){
       pinMode(pinNumber, OUTPUT);
-      value = 200;
     }
     
     byte speedUp(){
