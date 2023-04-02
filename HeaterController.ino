@@ -42,9 +42,9 @@ class ArduinoComponent {
 //PWM Class
 class PWM : public ArduinoComponent {
   public:
-    PWM(byte pin){
-      pinMode(pinNumber = pin, OUTPUT);
-      value = 200;
+    PWM(byte pin): pinNumber(pin){
+      pinMode(pinNumber, OUTPUT);
+      value = 20;
     }
     
     virtual byte speedUp(){
@@ -83,11 +83,8 @@ class PWM : public ArduinoComponent {
 //Button Class
 class Button {
   public: 
-    Button(byte pin, void (*fn)(ArduinoComponent), ArduinoComponent component){
-      lastRead = 1;
-      function = fn;
-      arduinoComponent = component;
-      pinMode(pinNumber = pin, INPUT_PULLUP);
+    Button(byte pin, void (*fn)(ArduinoComponent), ArduinoComponent component): pinNumber(pin),lastRead(1), function(fn), arduinoComponent(component){
+      pinMode(pinNumber, INPUT_PULLUP);
     }
 
     void checkPressButton() {
