@@ -44,29 +44,33 @@ class PWM : public ArduinoComponent {
   public:
     PWM(byte pin){
       pinMode(pinNumber = pin, OUTPUT);
-      value = 20;
+      value = 200;
     }
     
-    char speedUp(){
-      if (value + 20 >= 100){
-        Log((String)"No se aumenta por estar al máximo. PWM: " + value);
+    virtual byte speedUp(){
+      if (value + 20 > 100){
+        Log("No se aumenta por estar al máximo. PWM: " + (String)value);
         updatePWM(value);
         return value;
       }
       return value+=20;
     }
 
-    char speedDown(){
-      if (value - 20 <= 20){
-        Log((String)"No se disminuye por estar al minimo. PWM: " + value);
+    virtual byte speedDown(){
+      if (value - 20 < 20){
+        Log("No se disminuye por estar al minimo. PWM: " + (String)value);
         updatePWM(value);
         return value;
       }
-      return value+=20;
+      return value-=20;
     }
 
     void updatePWM(char value){
       analogWrite(pinNumber, map(value, 0, 100, 0, 255));
+    }
+
+    virtual byte getValue(){
+      return value;
     }
   private: 
     byte pinNumber;
@@ -122,15 +126,15 @@ class Button {
 //Button Press Functions
 void imprimir(){
   Serial.println("impresion");
-}
+};
 
 void speedUp(PWM pwm){
   Log((String)"Se aumenta velocidad: " + pwm.speedUp());
-}
+};
 
 void speedDown(PWM pwm){
   Log((String)"Se disminuye velocidad: " + pwm.speedDown());
-}
+};
 
 
 
@@ -146,13 +150,14 @@ void setup() {
   // pinMode(pinRed, INPUT_PULLUP);
   // pinMode(pinOrange, INPUT_PULLUP);
   // pinMode(pinWhite, INPUT_PULLUP);
-}
+};
 
 void loop() {
   redButton.checkPressButton();
   orangeButton.checkPressButton();
   whiteButton.checkPressButton();
-}
+  // Log("El valor de pwm es: " + (String)pwm.getValue());
+};
 
 //Viejo
 // void loop() {
