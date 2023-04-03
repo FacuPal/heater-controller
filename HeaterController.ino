@@ -18,7 +18,7 @@ class Relay : public ArduinoComponent {
     void turnOn(){
       turnedOn ? Log("Se va a apagar") : Log("Se va a prender");
       digitalWrite(pinNumber,turnedOn=!turnedOn);
-      return turnedOn;
+      return;
     }
   private: 
     byte pinNumber;
@@ -37,23 +37,23 @@ class PWM : public ArduinoComponent {
       if (value + 20 > 100){
         Log("No se aumenta por estar al máximo. PWM: " + (String)value);
         
-        return value;
+        return;
       }
       value+=20;
       Log((String)"Se aumenta velocidad: " + value);
       updatePWM(value);
-      return value;
+      return;
     }
 
     void speedDown(){
       if (value - 20 < 20){
         Log("No se disminuye por estar al minimo. PWM: " + (String)value);
-        return value;
+        return;
       }
       value-=20;
       Log((String)"Se disminuye velocidad: " + value);
       updatePWM(value);
-      return value;
+      return;
     }
 
     void updatePWM(byte value){
