@@ -3,6 +3,10 @@
 #define DEBOUNCER 500
 
 class ArduinoComponent {
+  public: 
+    virtual void turnOn(){}
+    virtual void speedUp(){}
+    virtual void speedDown(){}
   private: 
     byte pinNumber;
     byte pinType;
@@ -114,17 +118,17 @@ class Button {
 
 
 //Button Press Functions
-void turnOn(Relay * relay){
+void turnOn(ArduinoComponent * relay){
   relay->turnOn();
   // Log((String)"Se maneja power: " + relay->turnOn());
 };
 
-void speedUp(PWM * pwm){
+void speedUp(ArduinoComponent * pwm){
   pwm->speedUp();
   // Log((String)"Se aumenta velocidad: " + pwm->speedUp());
 };
 
-void speedDown(PWM * pwm){
+void speedDown(ArduinoComponent * pwm){
   pwm->speedDown();
   //Log((String)"Se disminuye velocidad: " + pwm->speedDown());
 };
